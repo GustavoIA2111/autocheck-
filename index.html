@@ -267,7 +267,8 @@
         contenedorResultados.innerHTML = `<div class="msg-placeholder" style="color: var(--primary); font-weight: bold;">Conectando con Municipalidad de Córdoba...<br>Consultando dominio ${dominio}.</div>`;
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/consultar?dominio=${dominio}`);
+            // URL configurada con tu servidor en Render
+            const response = await fetch(`https://autocheck-nssj.onrender.com/consultar?dominio=${dominio}`);
             const data = await response.json();
 
             contenedorResultados.innerHTML = '';
@@ -285,7 +286,7 @@
                 }
             }
         } catch (err) {
-            contenedorResultados.innerHTML = `<div class="msg-error">Error al conectar con la API backend. Asegurate de que Uvicorn esté corriendo.</div>`;
+            contenedorResultados.innerHTML = `<div class="msg-error">Error al conectar con la API backend en la nube.</div>`;
         } finally {
             btnBuscar.disabled = false;
             progressBar.style.display = 'none';
