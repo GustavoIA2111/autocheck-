@@ -56,23 +56,22 @@
         }
 
         .brand img {
-            width: 56px;
-            height: 56px;
+            width: 48px;
+            height: 48px;
             object-fit: contain;
         }
 
         .brand-text h1 {
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             color: #0F172A;
             font-weight: 800;
             line-height: 1.1;
         }
 
         .brand-text p {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
             font-weight: 500;
-            margin-top: 2px;
         }
 
         .badge {
@@ -119,13 +118,12 @@
             padding: 14px 16px;
             border: 2px solid var(--border);
             border-radius: 8px;
-            font-size: 1.35rem;
+            font-size: 1.2rem;
             font-weight: 800;
             text-transform: uppercase;
             text-align: center;
             outline: none;
             transition: border-color 0.2s;
-            width: 100%;
             letter-spacing: 2px;
         }
 
@@ -140,7 +138,7 @@
             padding: 14px 22px;
             border-radius: 8px;
             font-weight: 800;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: background-color 0.2s;
             width: 100%;
@@ -162,7 +160,7 @@
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            min-height: 250px;
+            min-height: 220px;
         }
 
         .result-card h2 {
@@ -183,7 +181,6 @@
         #result-content {
             font-size: 0.95rem;
             line-height: 1.5;
-            word-break: break-word;
         }
 
         .spinner {
@@ -210,7 +207,7 @@
                 <img src="logo.png" alt="Logo">
                 <div class="brand-text">
                     <h1>AutoCheck</h1>
-                    <p>Consulta en Tiempo Real</p>
+                    <p>Consulta Registral en Tiempo Real</p>
                 </div>
             </div>
             <span class="badge">PRO</span>
@@ -219,7 +216,7 @@
         <div class="search-card">
             <label for="patente">Dominio / Patente a Consultar</label>
             <div class="input-group">
-                <input type="text" id="patente" placeholder="" maxlength="8" autofocus autocomplete="off">
+                <input type="text" id="patente" placeholder="AA123BC" maxlength="8" autocomplete="off">
                 <button onclick="consultar()">CONSULTAR</button>
             </div>
         </div>
@@ -234,14 +231,6 @@
     </div>
 
     <script>
-        function renderValue(val) {
-            if (val === null || val === undefined) return '';
-            if (typeof val === 'object') {
-                return '<pre style="background:#f8fafc; padding:8px; border-radius:6px; font-size:0.85rem; overflow-x:auto;">' + JSON.stringify(val, null, 2) + '</pre>';
-            }
-            return String(val);
-        }
-
         async function consultar() {
             const patenteInput = document.getElementById('patente');
             const patente = patenteInput.value.trim();
@@ -263,24 +252,27 @@
                 spinner.style.display = 'none';
 
                 if (response.ok) {
-                    if (data.datos && typeof data.datos === 'object') {
+                    if (data.datos) {
                         let html = '<ul style="list-style: none; padding: 0;">';
                         for (const [k, v] of Object.entries(data.datos)) {
-                            html += `<li style="padding: 8px 0; border-bottom: 1px solid #f1f5f9;"><strong>${k}:</strong> ${renderValue(v)}</li>`;
+                            html += `<li style="padding: 8px 0; border-bottom: 1px solid #f1f5f9;"><strong>${k}:</strong> ${v}</li>`;
                         }
                         html += '</ul>';
                         resultContent.innerHTML = html;
+                    } else if (data.error) {
+                        // Manejo amigable cuando no se encuentran datos
+                        resultContent.innerHTML = `<p style="color: #d97706; font-weight: 600; text-align: center; margin-top: 15px;">⚠️ ${data.error}</p>`;
                     } else if (data.mensaje) {
-                        resultContent.innerHTML = `<p style="color: #d97706; font-weight: 600;">${renderValue(data.mensaje)}</p>`;
+                        resultContent.innerHTML = `<p style="color: #d97706; font-weight: 600; text-align: center; margin-top: 15px;">${data.mensaje}</p>`;
                     } else {
                         resultContent.innerHTML = `<pre style="background:#f8fafc; padding:10px; border-radius:6px; font-size:0.85rem; overflow-x:auto;">${JSON.stringify(data, null, 2)}</pre>`;
                     }
                 } else {
-                    let errMessage = 'Ocurrió un error al consultar.';
+                    let detailMsg = 'Ocurrió un error al consultar.';
                     if (data.detail) {
-                        errMessage = typeof data.detail === 'object' ? JSON.stringify(data.detail) : data.detail;
+                        detailMsg = typeof data.detail === 'object' ? JSON.stringify(data.detail) : data.detail;
                     }
-                    resultContent.innerHTML = `<p style="color: #dc2626; font-weight: 600;">Error: ${errMessage}</p>`;
+                    resultContent.innerHTML = `<p style="color: #dc2626; font-weight: 600;">Error: ${detailMsg}</p>`;
                 }
             } catch (err) {
                 spinner.style.display = 'none';
